@@ -14,24 +14,12 @@
       --accent: #00b894;
       --error: #e74c3c;
     }
-
-    @page {
-      size: A4 portrait;
-      margin: 12mm;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* impresion colores exactos */
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg);
@@ -42,11 +30,31 @@
       padding: 20px;
     }
 
-    h1 {
-      color: var(--primary);
-      margin-bottom: 16px;
-      font-weight: 600;
+    /* HEADER: título + botón alineados */
+    .header {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
+    .header h1 {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.6rem;
+    }
+    #download {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    #download:hover { background: #019d7a; }
 
     /* FORM */
     form {
@@ -58,17 +66,12 @@
       max-width: 500px;
       margin-bottom: 24px;
     }
-
-    .field {
-      margin-bottom: 12px;
-    }
-
+    .field { margin-bottom: 12px; }
     .field label {
       display: block;
       font-weight: 600;
       margin-bottom: 4px;
     }
-
     .field input {
       width: 100%;
       padding: 8px;
@@ -76,8 +79,7 @@
       border-radius: 4px;
       font-size: 0.95rem;
     }
-
-    button, #download {
+    button.submit {
       background: var(--accent);
       color: #fff;
       border: none;
@@ -88,53 +90,37 @@
       transition: background .2s;
       margin-top: 8px;
     }
+    button.submit:hover { background: #019d7a; }
 
-    button:hover, #download:hover {
-      background: #019d7a;
-    }
-
-    /* export button fuera del comprobante */
-    #download {
-      align-self: flex-start;
-      display: none;
-    }
-
-    /* CARD */
+    /* COMPROBANTE */
     #comprobante {
       display: none;
       flex-direction: column;
       align-items: center;
     }
-
     .card {
       background: var(--card);
       max-width: 720px;
+      width: 100%;
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       padding: 32px;
       line-height: 1.6;
       margin-bottom: 16px;
-      width: 100%;
     }
-
     h1.card-title {
       text-align: center;
       font-size: 1.8rem;
       font-weight: 600;
       margin-bottom: 4px;
     }
-
     .subtitle {
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-sec);
       margin-bottom: 24px;
     }
-
-    .section {
-      margin-bottom: 24px;
-    }
-
+    .section { margin-bottom: 24px; }
     .section h2 {
       position: relative;
       font-size: 1rem;
@@ -142,52 +128,26 @@
       margin-bottom: 12px;
       color: var(--text);
     }
-
     .section h2::after {
       content: '';
       position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 40px;
-      height: 3px;
+      bottom: -4px; left: 0;
+      width: 40px; height: 3px;
       background: var(--primary);
       border-radius: 2px;
     }
-
     .items {
       display: grid;
       grid-template-columns: auto 1fr;
       row-gap: 10px;
       column-gap: 16px;
     }
-
-    .label {
-      font-weight: 600;
-    }
-
-    .value {
-      color: var(--text-sec);
-    }
-
-    a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .payment-item {
-      margin-bottom: 16px;
-    }
-
-    .payment-item .label {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .payment-item .value {
-      margin-left: 8px;
-      color: var(--text-sec);
-    }
-
+    .label { font-weight: 600; }
+    .value { color: var(--text-sec); }
+    a { color: var(--primary); text-decoration: none; }
+    .payment-item { margin-bottom: 16px; }
+    .payment-item .label { font-weight: 600; margin-bottom: 4px; }
+    .payment-item .value { margin-left: 8px; color: var(--text-sec); }
     .important {
       text-align: center;
       background: #ffeaea;
@@ -199,23 +159,23 @@
     }
 
     @media print {
-      #download, form {
-        display: none !important;
-      }
-      body {
-        background: #fff;
-      }
-      .card {
-        box-shadow: none;
-        margin: 0;
-      }
+      form,
+      #download,
+      .header { display: none !important; }
+      body { background: #fff; }
+      .card { box-shadow: none; margin: 0; }
     }
   </style>
 </head>
 <body>
 
+  <!-- HEADER: título + botón -->
+<div class="header">
   <h1>Generar comprobante de reserva</h1>
+  <button id="download">📥 Exportar a PDF</button>
+</div>
 
+  <!-- FORMULARIO -->
   <form id="datosForm">
     <div class="field">
       <label for="nombre">Nombre</label>
@@ -253,12 +213,10 @@
       <label for="saldo">Saldo restante ($)</label>
       <input id="saldo" name="saldo" type="number" required>
     </div>
-    <button type="submit">Generar comprobante</button>
+    <button class="submit" type="submit">Generar comprobante</button>
   </form>
 
-  <!-- botón de exportación fuera del comprobante -->
-  <button id="download">📥 Exportar a PDF</button>
-
+  <!-- CONTENEDOR DEL COMPROBANTE -->
   <div id="comprobante">
     <div class="card">
       <h1 class="card-title">🏡 COMPLEJO MANZANA UNO</h1>
@@ -267,7 +225,7 @@
       <div class="section">
         <h2>📍 Ubicación</h2>
         <div class="items">
-          <div class="label">Google Maps</div>
+          <div class="label">Departamento 307, Manzana Uno, Mar de las Pampas</div>
           <div class="value">
             <a href="https://maps.app.goo.gl/GmtZ4gdKNzQTK6rx6" target="_blank">
               Ver ubicación
@@ -279,20 +237,13 @@
       <div class="section">
         <h2>📄 Detalle de alquiler</h2>
         <div class="items">
-          <div class="label">Nombre:</div>
-          <div class="value" id="outNombre"></div>
-          <div class="label">Huéspedes:</div>
-          <div class="value" id="outHuespedes"></div>
-          <div class="label">Teléfono:</div>
-          <div class="value" id="outTelefono"></div>
-          <div class="label">Ingreso:</div>
-          <div class="value" id="outCheckin"></div>
-          <div class="label">Egreso:</div>
-          <div class="value" id="outCheckout"></div>
-          <div class="label">Estadía:</div>
-          <div class="value" id="outNoches"></div>
-          <div class="label">Valor total:</div>
-          <div class="value" id="outValor"></div>
+          <div class="label">Nombre</div><div class="value" id="outNombre"></div>
+          <div class="label">Huéspedes</div><div class="value" id="outHuespedes"></div>
+          <div class="label">Teléfono</div><div class="value" id="outTelefono"></div>
+          <div class="label">Ingreso</div><div class="value" id="outCheckin"></div>
+          <div class="label">Egreso</div><div class="value" id="outCheckout"></div>
+          <div class="label">Estadía</div><div class="value" id="outNoches"></div>
+          <div class="label">Valor total</div><div class="value" id="outValor"></div>
         </div>
       </div>
 
@@ -311,26 +262,19 @@
       <div class="section">
         <h2>🙋‍♀️ Datos de la comercializadora</h2>
         <div class="items">
-          <div class="label">Nombre</div>
-          <div class="value">Sra. Lizzy Tochetto</div>
-          <div class="label">WhatsApp</div>
-          <div class="value">
-            <a href="https://wa.me/5492255424677" target="_blank">
-              02255 15 424 677
-            </a>
+          <div class="label">Nombre</div><div class="value">Sra. Lizzy Tochetto</div>
+          <div class="label">WhatsApp</div><div class="value">
+            <a href="https://wa.me/5492255424677" target="_blank">02255 15 424 677</a>
           </div>
         </div>
       </div>
 
-      <div class="important">
-        🚫 Recuerda: en el complejo no se aceptan mascotas.
-      </div>
+      <div class="important">🚫 Recuerda: en el complejo no se aceptan mascotas.</div>
     </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <script>
-    // formatear fecha a DD-MM-YYYY
     function formatDate(input) {
       const d = new Date(input);
       const day = String(d.getDate()).padStart(2,'0');
@@ -341,25 +285,24 @@
     document.getElementById('datosForm').addEventListener('submit', e => {
       e.preventDefault();
       const v = id => document.getElementById(id).value;
-      const adultos = parseInt(v('adultos'));
-      const menores = parseInt(v('menores'));
-      let huespedesTxt = [];
-      if (adultos)  huespedesTxt.push(`${adultos} adulto${adultos>1?'s':''}`);
-      if (menores)  huespedesTxt.push(`${menores} menor${menores>1?'es':''}`);
+      const adultos = +v('adultos'), menores = +v('menores');
+      let txt = [];
+      if(adultos) txt.push(`${adultos} adulto${adultos>1?'s':''}`);
+      if(menores) txt.push(`${menores} menor${menores>1?'es':''}`);
 
-      document.getElementById('outNombre').innerText     = v('nombre');
-      document.getElementById('outHuespedes').innerText  = huespedesTxt.join(' y ');
-      document.getElementById('outTelefono').innerText   = v('telefono');
-      document.getElementById('outCheckin').innerText    = `${formatDate(v('checkin'))} – 16:00 hs (coord. con comercializadora)`;
-      document.getElementById('outCheckout').innerText   = `${formatDate(v('checkout'))} – 10:00 hs`;
-      document.getElementById('outNoches').innerText     = `${Math.round((new Date(v('checkout')) - new Date(v('checkin'))) / 86400000)} noches`;
-      document.getElementById('outValor').innerText      = `$${parseFloat(v('valor')).toLocaleString()},-`;
-      document.getElementById('outDeposito').innerText   = `$${parseFloat(v('deposito')).toLocaleString()},- dentro de las 48 HS. TRANSFERIDO/DEPOSITADO.`;
-      document.getElementById('outSaldo').innerText      = `$${parseFloat(v('saldo')).toLocaleString()},- a abonar en el momento del ingreso.`;
+      document.getElementById('outNombre').innerText    = v('nombre');
+      document.getElementById('outHuespedes').innerText = txt.join(' y ');
+      document.getElementById('outTelefono').innerText  = v('telefono');
+      document.getElementById('outCheckin').innerText   = `${formatDate(v('checkin'))} – 16:00 hs (coord. con comercializadora)`;
+      document.getElementById('outCheckout').innerText  = `${formatDate(v('checkout'))} – 10:00 hs`;
+      document.getElementById('outNoches').innerText    = `${Math.round((new Date(v('checkout'))-new Date(v('checkin')))/86400000)} noches`;
+      document.getElementById('outValor').innerText     = `$${(+v('valor')).toLocaleString()},-`;
+      document.getElementById('outDeposito').innerText  = `$${(+v('deposito')).toLocaleString()},- dentro de las 48 HS. TRANSFERIDO/DEPOSITADO.`;
+      document.getElementById('outSaldo').innerText     = `$${(+v('saldo')).toLocaleString()},- a abonar en el momento del ingreso`;
 
-      document.getElementById('datosForm').style.display = 'none';
+      document.getElementById('datosForm').style.display    = 'none';
       document.getElementById('comprobante').style.display = 'flex';
-      document.getElementById('download').style.display = 'block';
+      document.getElementById('download').style.display     = 'block';
     });
 
     document.getElementById('download').addEventListener('click', () => {
@@ -367,18 +310,8 @@
         margin:       12,
         filename:     'comprobante_reserva.pdf',
         image:        { type: 'jpeg', quality: 1.0 },
-        html2canvas:  {
-          scale:           4,
-          dpi:             300,
-          letterRendering: true,
-          useCORS:         true
-        },
-        jsPDF:        {
-          unit:        'mm',
-          format:      'a4',
-          orientation: 'portrait',
-          compressPDF: false
-        }
+        html2canvas:  { scale: 4, dpi: 300, letterRendering: true, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compressPDF: false }
       }).from(document.getElementById('comprobante')).save();
     });
   </script>
