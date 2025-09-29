@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario + Comprobante – Complejo Manzana Uno</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --card: #fff;
+      --text: #333;
+      --text-sec: #555;
+      --primary: #4c6ef5;
+      --accent: #00b894;
+      --error: #e74c3c;
+    }
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: var(--primary);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    /* FORM */
+    form {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 24px;
+    }
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .field input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    button, #download {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .2s;
+      margin-top: 8px;
+    }
+    button:hover, #download:hover {
+      background: #019d7a;
+    }
+    /* CARD */
+    #comprobante { display: none; }
+    .card {
+      background: var(--card);
+      max-width: 720px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 32px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    h1.card-title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-sec);
+      margin-bottom: 24px;
+    }
+    .section { margin-bottom: 24px; }
+    .section h2 {
+      position: relative;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 40px; height: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .items {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      row-gap: 10px;
+      column-gap: 16px;
+    }
+    .label { font-weight: 600; }
+    .value { color: var(--text-sec); }
+    a { color: var(--primary); text-decoration: none; }
+    .payment-item { margin-bottom: 16px; }
+    .payment-item .label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .payment-item .value {
+      margin-left: 8px;
+      color: var(--text-sec);
+    }
+    .important {
+      text-align: center;
+      background: #ffeaea;
+      padding: 12px;
+      border-left: 4px solid var(--error);
+      border-radius: 4px;
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+    @media print {
+      #download, form { display: none!important; }
+      body { background: #fff; }
+      .card { box-shadow: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Generar comprobante de reserva</h1>
+
+  <form id="datosForm">
+    <div class="field">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" name="nombre" required>
+    </div>
+    <div class="field">
+      <label for="adultos">Adultos</label>
+      <input id="adultos" name="adultos" type="number" min="0" value="1" required>
+    </div>
+    <div class="field">
+      <label for="menores">Menores</label>
+      <input id="menores" name="menores" type="number" min="0" value="0" required>
+    </div>
+    <div class="field">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" name="telefono" required>
+    </div>
+    <div class="field">
+      <label for="checkin">Fecha de ingreso</label>
+      <input id="checkin" name="checkin" type="date" required>
+    </div>
+    <div class="field">
+      <label for="checkout">Fecha de egreso</label>
+      <input id="checkout" name="checkout" type="date" required>
+    </div>
+    <div class="field">
+      <label for="valor">Valor total estadía ($)</label>
+      <input id="valor" name="valor" type="number" required>
+    </div>
+    <div class="field">
+      <label for="deposito">Depósito/Transferencia ($)</label>
+      <input id="deposito" name="deposito" type="number" required>
+    </div>
+    <div class="field">
+      <label for="saldo">Saldo restante ($)</label>
+      <input id="saldo" name="saldo" type="number" required>
+    </div>
+    <button type="submit">Generar comprobante</button>
+  </form>
+
+  <div id="comprobante">
+    <div class="card">
+      <h1 class="card-title">🏡 COMPLEJO MANZANA UNO</h1>
+      <div class="subtitle">Mar de las Pampas – Departamento 307</div>
+
+      <div class="section">
+        <h2>📍 Ubicación</h2>
+        <div class="items">
+          <div class="label">Google Maps</div>
+          <div class="value">
+            <a href="https://maps.app.goo.gl/GmtZ4gdKNzQTK6rx6" target="_blank">Ver ubicación</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📄 Detalle de alquiler</h2>
+        <div class="items">
+          <div class="label">Nombre:</div>
+          <div class="value" id="outNombre"></div>
+          <div class="label">Huéspedes:</div>
+          <div class="value" id="outHuespedes"></div>
+          <div class="label">Teléfono:</div>
+          <div class="value" id="outTelefono"></div>
+          <div class="label">Ingreso:</div>
+          <div class="value" id="outCheckin"></div>
+          <div class="label">Egreso:</div>
+          <div class="value" id="outCheckout"></div>
+          <div class="label">Estadía:</div>
+          <div class="value" id="outNoches"></div>
+          <div class="label">Valor total:</div>
+          <div class="value" id="outValor"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>💳 Modalidad de pago</h2>
+        <div class="payment-item">
+          <div class="label">Depósito/transferencia bancaria:</div>
+          <div class="value" id="outDeposito"></div>
+        </div>
+        <div class="payment-item">
+          <div class="label">Saldo restante:</div>
+          <div class="value" id="outSaldo"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🙋‍♀️ Datos de la comercializadora</h2>
+        <div class="items">
+          <div class="label">Nombre</div>
+          <div class="value">Sra. Lizzy Tochetto</div>
+          <div class="label">WhatsApp</div>
+          <div class="value">
+            <a href="https://wa.me/5492255424677" target="_blank">02255 15 424 677</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="important">🚫 Recuerda: en el complejo no se aceptan mascotas.</div>
+    </div>
+
+    <button id="download">📥 Exportar a PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script>
+    // formatear fecha a DD-MM-YYYY
+    function formatDate(input) {
+      const d = new Date(input);
+      const day = String(d.getDate()).padStart(2,'0');
+      const month = String(d.getMonth()+1).padStart(2,'0');
+      return `${day}-${month}-${d.getFullYear()}`;
+    }
+
+    document.getElementById('datosForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const v = id => document.getElementById(id).value;
+      const adultos = parseInt(v('adultos'));
+      const menores = parseInt(v('menores'));
+      let huespedesTxt = [];
+      if (adultos)  huespedesTxt.push(`${adultos} adulto${adultos>1?'s':''}`);
+      if (menores)  huespedesTxt.push(`${menores} menor${menores>1?'es':''}`);
+
+      document.getElementById('outNombre').innerText     = v('nombre');
+      document.getElementById('outHuespedes').innerText  = huespedesTxt.join(' y ');
+      document.getElementById('outTelefono').innerText   = v('telefono');
+      document.getElementById('outCheckin').innerText    = `${formatDate(v('checkin'))} – 16:00 hs (coord. con comercializadora)`;
+      document.getElementById('outCheckout').innerText   = `${formatDate(v('checkout'))} – 10:00 hs`;
+      document.getElementById('outNoches').innerText     = `${Math.round((new Date(v('checkout')) - new Date(v('checkin'))) / 86400000)} noches`;
+      document.getElementById('outValor').innerText      = `$${parseFloat(v('valor')).toLocaleString()},-`;
+      document.getElementById('outDeposito').innerText   = `$${parseFloat(v('deposito')).toLocaleString()},- dentro de las 48 HS. TRANSFERIDO/DEPOSITADO.`;
+      document.getElementById('outSaldo').innerText      = `$${parseFloat(v('saldo')).toLocaleString()},- a abonar en el momento del ingreso`;
+
+      document.getElementById('datosForm').style.display = 'none';
+      document.getElementById('comprobante').style.display = 'flex';
+    });
+
+    document.getElementById('download').addEventListener('click', () => {
+      html2pdf().set({
+        margin:       12,
+        filename:     'comprobante_reserva.pdf',
+        image:        { type: 'jpeg', quality: 1.0 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(document.getElementById('comprobante')).save();
+    });
+  </script>
+</body>
+</html>
