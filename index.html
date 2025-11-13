@@ -275,27 +275,76 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <script>
-    function formatDate(input) {
-      const d = new Date(input);
-      const day = String(d.getDate()).padStart(2,'0');
-      const month = String(d.getMonth()+1).padStart(2,'0');
-      return `${day}-${month}-${d.getFullYear()}`;
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+
+    // Set today as the minimum for check-in
+    const today = new Date().toISOString().split('T')[0];
+    checkinInput.min = today;
+
+    checkinInput.addEventListener('change', () => {
+      // The minimum checkout date is the check-in date.
+      checkoutInput.min = checkinInput.value;
+      // If checkout is already set and is now invalid, reset it.
+      if (checkoutInput.value && checkoutInput.value < checkinInput.value) {
+        checkoutInput.value = checkinInput.value;
+      }
+    });
+    
+    // Also set min for checkout when page loads if checkin has a value
+    if (checkinInput.value) {
+        checkoutInput.min = checkinInput.value;
+    }
+
+
+    /**
+     * Reformats a date string from 'YYYY-MM-DD' to 'DD-MM-YYYY'.
+     * @param {string} dateString - The date string in 'YYYY-MM-DD' format.
+     * @returns {string} The date string in 'DD-MM-YYYY' format.
+     */
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const [year, month, day] = dateString.split('-');
+      return `${day}-${month}-${year}`;
+    }
+
+    /**
+     * Calculates the difference in days between two dates, avoiding timezone issues.
+     * @param {string} dateStr1 - The start date in 'YYYY-MM-DD' format.
+     * @param {string} dateStr2 - The end date in 'YYYY-MM-DD' format.
+     * @returns {number} The number of full days between the two dates.
+     */
+    function dayDifference(dateStr1, dateStr2) {
+      const d1 = new Date(dateStr1);
+      const d2 = new Date(dateStr2);
+      const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate());
+      const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate());
+      return Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24));
     }
 
     document.getElementById('datosForm').addEventListener('submit', e => {
       e.preventDefault();
       const v = id => document.getElementById(id).value;
+
+      const checkin = v('checkin');
+      const checkout = v('checkout');
+
+      if (checkout < checkin) {
+        alert('La fecha de egreso no puede ser anterior a la fecha de ingreso.');
+        return;
+      }
+
       const adultos = +v('adultos'), menores = +v('menores');
       let txt = [];
-      if(adultos) txt.push(`${adultos} adulto${adultos>1?'s':''}`);
-      if(menores) txt.push(`${menores} menor${menores>1?'es':''}`);
+      if (adultos) txt.push(`${adultos} adulto${adultos > 1 ? 's' : ''}`);
+      if (menores) txt.push(`${menores} menor${menores > 1 ? 'es' : ''}`);
 
       document.getElementById('outNombre').innerText    = v('nombre');
       document.getElementById('outHuespedes').innerText = txt.join(' y ');
       document.getElementById('outTelefono').innerText  = v('telefono');
-      document.getElementById('outCheckin').innerText   = `${formatDate(v('checkin'))} – 16:00 hs (coord. con comercializadora)`;
-      document.getElementById('outCheckout').innerText  = `${formatDate(v('checkout'))} – 10:00 hs`;
-      document.getElementById('outNoches').innerText    = `${Math.round((new Date(v('checkout'))-new Date(v('checkin')))/86400000)} noches`;
+      document.getElementById('outCheckin').innerText   = `${formatDate(checkin)} – 16:00 hs (coord. con comercializadora)`;
+      document.getElementById('outCheckout').innerText  = `${formatDate(checkout)} – 10:00 hs`;
+      document.getElementById('outNoches').innerText    = `${dayDifference(checkin, checkout)} noches`;
       document.getElementById('outValor').innerText     = `$${(+v('valor')).toLocaleString()},-`;
       document.getElementById('outDeposito').innerText  = `$${(+v('deposito')).toLocaleString()},- dentro de las 48 HS. TRANSFERIDO/DEPOSITADO.`;
       document.getElementById('outSaldo').innerText     = `$${(+v('saldo')).toLocaleString()},- a abonar en el momento del ingreso`;
@@ -306,9 +355,13 @@
     });
 
     document.getElementById('download').addEventListener('click', () => {
+      const nombre = document.getElementById('nombre').value || 'huesped';
+      const checkin = document.getElementById('checkin').value;
+      const filename = `comprobante_reserva_${nombre.replace(/\s+/g, '_')}_${checkin}.pdf`;
+
       html2pdf().set({
         margin:       12,
-        filename:     'comprobante_reserva.pdf',
+        filename:     filename,
         image:        { type: 'jpeg', quality: 1.0 },
         html2canvas:  { scale: 4, dpi: 300, letterRendering: true, useCORS: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compressPDF: false }
