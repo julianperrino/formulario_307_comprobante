@@ -189,6 +189,10 @@
       <label for="menores">Menores</label>
       <input id="menores" name="menores" type="number" min="0" value="0" required>
     </div>
+<div class="field" id="edadMenorField" style="display:none;">
+  <label for="edadMenor">Edad del menor</label>
+  <input id="edadMenor" name="edadMenor" type="number" min="0">
+</div>
     <div class="field">
       <label for="telefono">Teléfono</label>
       <input id="telefono" name="telefono" required>
@@ -277,6 +281,12 @@
   <script>
     const checkinInput = document.getElementById('checkin');
     const checkoutInput = document.getElementById('checkout');
+    // Mostrar / ocultar campo "Edad del menor"
+document.getElementById('menores').addEventListener('input', function () {
+  const field = document.getElementById('edadMenorField');
+  if (+this.value > 0) field.style.display = 'block';
+  else field.style.display = 'none';
+});
 
     // Set today as the minimum for check-in
     const today = new Date().toISOString().split('T')[0];
@@ -334,20 +344,35 @@
         return;
       }
 
-      const adultos = +v('adultos'), menores = +v('menores');
-      let txt = [];
-      if (adultos) txt.push(`${adultos} adulto${adultos > 1 ? 's' : ''}`);
-      if (menores) txt.push(`${menores} menor${menores > 1 ? 'es' : ''}`);
+   const adultos = +v('adultos'), menores = +v('menores');
+const edadMenor = v('edadMenor');
+
+let txt = [];
+
+if (adultos) 
+  txt.push(`${adultos} adulto${adultos > 1 ? 's' : ''}`);
+
+if (menores) {
+  let textoMenor = `${menores} menor${menores > 1 ? 'es' : ''}`;
+
+  // Si hay 1 menor, agregamos "(X años)"
+  if (menores === 1 && edadMenor) {
+    textoMenor += ` (${edadMenor} años)`;
+  }
+
+  txt.push(textoMenor);
+}
 
       document.getElementById('outNombre').innerText    = v('nombre');
       document.getElementById('outHuespedes').innerText = txt.join(' y ');
+      //document.getElementById('outEdadMenor').innerText = menores > 0 ? `${edadMenor} años` : '—';
       document.getElementById('outTelefono').innerText  = v('telefono');
       document.getElementById('outCheckin').innerText   = `${formatDate(checkin)} – 16:00 hs (coord. con comercializadora)`;
       document.getElementById('outCheckout').innerText  = `${formatDate(checkout)} – 10:00 hs`;
       document.getElementById('outNoches').innerText    = `${dayDifference(checkin, checkout)} noches`;
       document.getElementById('outValor').innerText     = `$${(+v('valor')).toLocaleString()},-`;
       document.getElementById('outDeposito').innerText  = `$${(+v('deposito')).toLocaleString()},- dentro de las 48 HS. TRANSFERIDO/DEPOSITADO.`;
-      document.getElementById('outSaldo').innerText     = `$${(+v('saldo')).toLocaleString()},- a abonar en el momento del ingreso`;
+      document.getElementById('outSaldo').innerText     = `$${(+v('saldo')).toLocaleString()},- a abonar en el momento del ingreso.`;
 
       document.getElementById('datosForm').style.display    = 'none';
       document.getElementById('comprobante').style.display = 'flex';
